@@ -1,3 +1,3 @@
-# TeXLive with SourceHan
+# TeXLive with Source Han Fonts
 
-(u)pLaTeX + dvipdfmxでAdobe提供の源ノ角ゴシック及び源ノ明朝を使うためのリポジトリ
+(u)pLaTeX + dvipdfmx + Source Han Fonts (with pxchfon by @zr-tex8r)
