@@ -23,7 +23,6 @@ RUN set -x \
 	&& tlmgr init-usertree \
 	&& tlmgr update --self --all \
 	&& cp $(kpsewhich -var-value TEXMFSYSVAR)/fonts/conf/texlive-fontconfig.conf /etc/fonts/conf.d/09-texlive.conf \
-	&& fc-cache -fsv \
 # フォントの整備
 	&& cd /tmp \
 	&& wget https://github.com/adobe-fonts/source-han-sans/raw/release/OTC/SourceHanSansOTC_M-H.zip \
@@ -37,7 +36,7 @@ RUN set -x \
 	&& mkdir -p $(kpsewhich -var-value TEXMFLOCAL)/fonts/opentype/adobe/sourcehansans \
 	&& mv SourceHanSansOTC*/*.ttc $(kpsewhich -var-value TEXMFLOCAL)/fonts/opentype/adobe/sourcehansans/ \
 	&& mv SourceHanSerifOTC*/*.ttc $(kpsewhich -var-value TEXMFLOCAL)/fonts/opentype/adobe/sourcehanserif/ \
-	&& mktexlsr \
+	&& fc-cache -fsv \
 # Takayuki YATO氏によるライブラリのインストール
 # PXchfon
 # 常に最新版が欲しいのでなければ`tlmgr install pxchfon`で問題ない
