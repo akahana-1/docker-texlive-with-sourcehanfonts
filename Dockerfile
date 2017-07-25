@@ -5,8 +5,9 @@ LABEL Desciption="tex build environment using (u)pLaTeX with Adobe Source Han Fo
 
 ARG REPOSITORY="http://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet/"
 ARG INSTALLER="install-tl-unx.tar.gz"
-ARG PROFILE="https://gist.github.com/akahana-1/44bb19536bbffc0dba25229b731ffdaf/raw/175706892f0e476f9aa6d24c6c45784fcdf1d2cd/texlive.profile"
 ARG TL_VERSION="2017"
+
+COPY texlive.profile /
 
 RUN set -x \
 	&& apt update \
@@ -17,7 +18,6 @@ RUN set -x \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& wget ${REPOSITORY}${INSTALLER} \
 	&& tar xvf ${INSTALLER} \
-	&& wget ${PROFILE} \
 	&& ./install-tl-*/install-tl -profile texlive.profile -repository ${REPOSITORY} \
 	&& export PATH=/usr/local/texlive/${TL_VERSION}/bin/x86_64-linux:${PATH} \
 	&& tlmgr init-usertree \
