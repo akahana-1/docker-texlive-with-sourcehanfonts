@@ -7,7 +7,7 @@ ARG REPOSITORY="http://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet/"
 ARG INSTALLER="install-tl-unx.tar.gz"
 ARG TL_VERSION="2017"
 
-COPY texlive.profile /
+COPY texlive.profile .
 
 RUN set -x \
 	&& apt update \
@@ -19,7 +19,8 @@ RUN set -x \
 	&& wget ${REPOSITORY}${INSTALLER} \
 	&& tar xvf ${INSTALLER} \
 	&& ./install-tl-*/install-tl -profile texlive.profile -repository ${REPOSITORY} \
-	&& export PATH=/usr/local/texlive/${TL_VERSION}/bin/x86_64-linux:${PATH} \
+ENV PATH /usr/local/texlive/${TL_VERSION}/bin/x86-64_linux:$PATH
+RUN set -x \
 	&& tlmgr init-usertree \
 	&& tlmgr update --self --all \
 	&& cp $(kpsewhich -var-value TEXMFSYSVAR)/fonts/conf/texlive-fontconfig.conf /etc/fonts/conf.d/09-texlive.conf \
@@ -39,19 +40,6 @@ RUN set -x \
 	&& fc-cache -fsv \
 # Takayuki YATO氏によるライブラリのインストール
 # PXchfon
-# 常に最新版が欲しいのでなければ`tlmgr install pxchfon`で問題ない
-#	&& wget https://github.com/zr-tex8r/PXchfon/archive/master.zip -O PXchfon.zip \
-#	&& unzip PXchfon.zip \
-#	&& mkdir -p $(kpsewhich -var-value TEXMFLOCAL)/tex/platex/pxchfon \
-#	&& mkdir -p $(kpsewhich -var-value TEXMFLOCAL)/fonts/tfm/public/pxchfon \
-#	&& mkdir -p $(kpsewhich -var-value TEXMFLOCAL)/fonts/vf/public/pxchfon \
-#	&& mkdir -p $(kpsewhich -var-value TEXMFLOCAL)/fonts/sfd/pxchfon \
-#	&& mv PXchfon*/*.sty $(kpsewhich -var-value TEXMFLOCAL)/tex/platex/pxchfon \
-#	&& mv PXchfon*/*.tfm $(kpsewhich -var-value TEXMFLOCAL)/fonts/tfm/public/pxchfon \
-#	&& mv PXchfon*/*.vf $(kpsewhich -var-value TEXMFLOCAL)/fonts/vf/public/pxchfon \
-#	&& mv PXchfon*/*.sfd $(kpsewhich -var-value TEXMFLOCAL)/fonts/sfd/pxchfon \
-#	&& mv PXchfon*/*.def $(kpsewhich -var-value TEXMFLOCAL)/tex/platex/pxchfon \
-#	&& mktexlsr \
 	&& tlmgr install pxchfon \
 # クリーニング
 	&& cd / \
