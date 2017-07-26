@@ -18,7 +18,7 @@ RUN set -x \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& wget ${REPOSITORY}${INSTALLER} \
 	&& tar xvf ${INSTALLER} \
-	&& ./install-tl-*/install-tl -profile texlive.profile -repository ${REPOSITORY} \
+	&& ./install-tl-*/install-tl -profile texlive.profile -repository ${REPOSITORY} 
 ENV PATH /usr/local/texlive/${TL_VERSION}/bin/x86-64_linux:$PATH
 RUN set -x \
 	&& tlmgr init-usertree \
