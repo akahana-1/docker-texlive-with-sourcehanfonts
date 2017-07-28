@@ -38,9 +38,7 @@ RUN set -x \
 	&& mv SourceHanSansOTC*/*.ttc $(kpsewhich -var-value TEXMFLOCAL)/fonts/opentype/adobe/sourcehansans/ \
 	&& mv SourceHanSerifOTC*/*.ttc $(kpsewhich -var-value TEXMFLOCAL)/fonts/opentype/adobe/sourcehanserif/ \
 	&& fc-cache -fsv \
-# Takayuki YATO氏によるライブラリのインストール
-# PXchfon
-	&& tlmgr install pxchfon \
+	&& mktexlsr \
 # クリーニング
 	&& cd / \
 	&& rm -rf /tmp/* \
