@@ -13,7 +13,7 @@ RUN set -x \
 	&& apt update \
 	&& apt dist-upgrade -y \
 	&& apt install --no-install-recommends -y \
-		wget perl fontconfig libwww-perl unzip \
+		wget perl fontconfig libwww-perl unzip ghostscript \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& wget ${REPOSITORY}${INSTALLER} \
