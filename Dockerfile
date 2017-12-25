@@ -13,16 +13,10 @@ RUN set -x \
 	&& apt update \
 	&& apt dist-upgrade -y \
 	&& apt install --no-install-recommends -y \
-		wget perl fontconfig libwww-perl unzip ghostscript \
-	&& apt install --no-install-recommends -y \
-		ghostscript imagemagick \
+		wget git imagemagick perl fontconfig libwww-perl unzip ghostscript \
 	&& wget ${REPOSITORY}${INSTALLER} \
 	&& tar xzvf ${INSTALLER} \
 	&& ./install-tl-*/install-tl -profile texlive.profile -repository ${REPOSITORY} 
-# ひとつのRUNごとにキャッシュが作られるので、テスト時はRUNコマンドをTeXLiveのインストールとそれ以降の環境設定で切り分ける
-# これをしないとDockerfileのテスト時に5GBのバイナリを落とす作業が毎回発生する
-# 本番環境ではふたつのRUNをひとつにまとめよう
-RUN set -x \
 	&& /usr/local/texlive/${TL_VERSION}/bin/*/tlmgr path add \
 	&& tlmgr init-usertree \
 	&& tlmgr update --self --all \
