@@ -16,7 +16,7 @@ RUN set -x \
 		wget git imagemagick perl fontconfig libwww-perl unzip ghostscript \
 	&& wget ${REPOSITORY}${INSTALLER} \
 	&& tar xzvf ${INSTALLER} \
-	&& ./install-tl-*/install-tl -profile texlive.profile -repository ${REPOSITORY} 
+	&& ./install-tl-*/install-tl -profile texlive.profile -repository ${REPOSITORY} \
 	&& /usr/local/texlive/${TL_VERSION}/bin/*/tlmgr path add \
 	&& tlmgr init-usertree \
 	&& tlmgr update --self --all \
