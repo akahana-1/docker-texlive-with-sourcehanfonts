@@ -1,21 +1,22 @@
-FROM debian:stretch
+FROM debian:stretch-slim
 
-MAINTAINER akahana_1<aakahana@gmail.com>
+LABEL Maintainer="akahana<akahana@akahana.jp>"
 LABEL Desciption="tex build environment using (u)pLaTeX with Adobe Source Han Fonts"
 
 ARG REPOSITORY="http://mirror.ctan.org/systems/texlive/tlnet/"
 ARG INSTALLER="install-tl-unx.tar.gz"
-ARG TL_VERSION="2017"
+ARG TL_VERSION="2018"
 
 COPY texlive.profile .
 
 RUN set -x \
-	&& apt update \
-	&& apt dist-upgrade -y \
-	&& apt install --no-install-recommends -y \
-		wget git imagemagick perl fontconfig libwww-perl unzip ghostscript \
+	&& apt update -qq \
+	&& apt install --no-install-recommends -y -qq \
+		wget perl fontconfig libwww-perl unzip ghostscript \
 	&& wget ${REPOSITORY}${INSTALLER} \
 	&& tar xzvf ${INSTALLER} \
+	&& sed -i 's@${TL_VERSION}@'${TL_VERSION}'@g' texlive.profile \
+	&& cat texlive.profile \
 	&& ./install-tl-*/install-tl -profile texlive.profile -repository ${REPOSITORY} \
 	&& /usr/local/texlive/${TL_VERSION}/bin/*/tlmgr path add \
 	&& tlmgr init-usertree \
