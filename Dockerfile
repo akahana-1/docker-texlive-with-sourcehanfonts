@@ -1,49 +1,47 @@
 FROM debian:stretch-slim
 
 LABEL Maintainer="akahana<akahana@akahana.jp>"
-LABEL Desciption="tex build environment using (u)pLaTeX with Adobe Source Han Fonts"
+LABEL Desciption="tex build environment with Adobe Source Han Fonts"
 
-ARG REPOSITORY="http://mirror.ctan.org/systems/texlive/tlnet/"
-ARG INSTALLER="install-tl-unx.tar.gz"
-ARG TL_VERSION="2018"
+ARG TL_VERSION="2019"
+ARG REPOSITORY="ftp://tug.org/historic/systems/texlive/${TL_VERSION}"
+ENV PATH="/usr/local/texlive/${TL_VERSION}/bin/x86_64-linux:$PATH"
 
-COPY texlive.profile .
 
 RUN set -x \
-	&& apt update -qq \
-	&& apt install --no-install-recommends -y -qq \
-		wget perl fontconfig libwww-perl unzip ghostscript \
-	&& wget ${REPOSITORY}${INSTALLER} \
-	&& tar xzvf ${INSTALLER} \
-	&& sed -i 's@${TL_VERSION}@'${TL_VERSION}'@g' texlive.profile \
-	&& cat texlive.profile \
-	&& ./install-tl-*/install-tl -profile texlive.profile -repository ${REPOSITORY} \
-	&& /usr/local/texlive/${TL_VERSION}/bin/*/tlmgr path add \
-	&& tlmgr init-usertree \
+	&& apt-get update -qq \
+	&& apt-get install --no-install-recommends -y -qq \
+		wget perl libwww-perl fontconfig unzip ghostscript \
+	&& mkdir /tmp/install-tl-unx \
+	&& wget -qO - ${REPOSITORY}/install-tl-unx.tar.gz | tar -xz -C /tmp/install-tl-unx --strip-components 1 \ 
+	&& cd /tmp/install-tl-unx \
+	&& printf "%s\n" "selected_scheme scheme-full" "option_doc 0" "option_src 0" > texlive.profile \
+	&& ./install-tl -profile texlive.profile \
 	&& tlmgr update --self --all \
 	&& cp $(kpsewhich -var-value TEXMFSYSVAR)/fonts/conf/texlive-fontconfig.conf \
 		 /etc/fonts/conf.d/09-texlive.conf \
 # フォントの整備
 	&& cd /tmp \
-	&& wget https://github.com/adobe-fonts/source-han-sans/raw/release/OTC/SourceHanSansOTC_M-H.zip \
-	&& wget https://github.com/adobe-fonts/source-han-sans/raw/release/OTC/SourceHanSansOTC_EL-R.zip \
-	&& wget https://github.com/adobe-fonts/source-han-serif/raw/release/OTC/SourceHanSerifOTC_EL-M.zip \
-	&& wget https://github.com/adobe-fonts/source-han-serif/raw/release/OTC/SourceHanSerifOTC_SB-H.zip \
+	&& wget -q https://github.com/adobe-fonts/source-han-sans/raw/release/OTC/SourceHanSansOTC_M-H.zip \
+	&& wget -q https://github.com/adobe-fonts/source-han-sans/raw/release/OTC/SourceHanSansOTC_EL-R.zip \
+	&& wget -q https://github.com/adobe-fonts/source-han-serif/raw/release/OTC/SourceHanSerifOTC_EL-M.zip \
+	&& wget -q https://github.com/adobe-fonts/source-han-serif/raw/release/OTC/SourceHanSerifOTC_SB-H.zip \
 # unzipでglobを指定するときはエスケープが必要
-	&& unzip SourceHan\*.zip \
-# RUNはsh -cで走るのでbash拡張が使えない
+	&& unzip -j SourceHanSans\*.zip *.ttc -d /tmp/SourceHanSans \
+	&& unzip -j SourceHanSerif\*.zip *.ttc -d /tmp/SourceHanSerif \
 	&& mkdir -p $(kpsewhich -var-value TEXMFLOCAL)/fonts/opentype/adobe/sourcehanserif \
 	&& mkdir -p $(kpsewhich -var-value TEXMFLOCAL)/fonts/opentype/adobe/sourcehansans \
-	&& mv SourceHanSansOTC*/*.ttc $(kpsewhich -var-value TEXMFLOCAL)/fonts/opentype/adobe/sourcehansans/ \
-	&& mv SourceHanSerifOTC*/*.ttc $(kpsewhich -var-value TEXMFLOCAL)/fonts/opentype/adobe/sourcehanserif/ \
+	&& mv /tmp/SourceHanSans/*.ttc $(kpsewhich -var-value TEXMFLOCAL)/fonts/opentype/adobe/sourcehansans/ \
+	&& mv /tmp/SourceHanSerif/*.ttc $(kpsewhich -var-value TEXMFLOCAL)/fonts/opentype/adobe/sourcehanserif/ \
 	&& fc-cache -fsv \
 	&& mktexlsr \
+	&& luaotfload-tool -fv \
 # クリーニング
 	&& cd / \
+	&& apt-get purge -qq -y wget unzip \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /tmp/* \
-	&& rm -rf install-tl*
 
 WORKDIR /root
 
